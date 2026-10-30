@@ -1,6 +1,10 @@
 export type Photo = { src: string; alt: string; title: string; ratio: number }
 
-export const PHOTOS: Photo[] = [
+// Path aset publik harus ikut `base` (GitHub Pages menyajikan situs di
+// sub-path /Portofolio/), sedangkan string literal tidak ditulis ulang Vite.
+const BASE = import.meta.env.BASE_URL
+
+const PHOTO_LIST: Photo[] = [
   { src: "/assets/photos/forweb/01.webp", title: "Langit senja", alt: "Langit mendung keabu-biruan di area terbuka", ratio: 0.749 },
   { src: "/assets/photos/forweb/02.webp", title: "Bulan Malam", alt: "Bulan di balik siluet pepohonan pada malam hari", ratio: 0.8 },
   { src: "/assets/photos/forweb/03.webp", title: "Senja Jingga", alt: "Langit senja jingga di atas ladang", ratio: 0.8 },
@@ -22,6 +26,8 @@ export const PHOTOS: Photo[] = [
   { src: "/assets/photos/forweb/19.webp", title: "Kabut Pagi", alt: "Motor di jalan berkabut pinggir sawah, pagi hari", ratio: 0.562 },
   { src: "/assets/photos/forweb/20.webp", title: "Rumah Danau", alt: "Rumah di tepi danau dikelilingi hutan lebat", ratio: 0.562 },
   { src: "/assets/photos/forweb/21.webp", title: "Tebing", alt: "Bangunan di atas tebing dengan cahaya pagi", ratio: 0.562 },
-  { src: "/assets/photos/forweb/22.webp", title: "Sacré-Cœur", alt: "Basilika Sacré-Cœur di Paris, langit cerah", ratio: 0.562 },
+  { src: "/assets/photos/forweb/22.webp", title: "SacrÃ©-CÅ“ur", alt: "Basilika SacrÃ©-CÅ“ur di Paris, langit cerah", ratio: 0.562 },
   { src: "/assets/photos/forweb/23.webp", title: "Anjing di Dahan", alt: "Anjing di atas dahan pohon di tepi danau", ratio: 0.562 },
 ]
+
+export const PHOTOS: Photo[] = PHOTO_LIST.map((p) => ({ ...p, src: BASE + p.src.slice(1) }))

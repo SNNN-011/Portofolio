@@ -89,7 +89,7 @@ export function PromptGenPreview() {
   return (
     <div className="grid h-full min-h-0 grid-cols-[0.85fr_1.15fr] gap-3 overflow-hidden rounded-xl bg-surface-2 p-3">
       <img
-        src="/assets/photos/promptgen.webp"
+        src={`${import.meta.env.BASE_URL}assets/photos/promptgen.webp`}
         alt="Pengendara helm putih di latar pepohonan hijau"
         loading="lazy"
         className="h-full min-h-0 w-full rounded-lg object-cover"
