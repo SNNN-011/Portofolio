@@ -1,0 +1,27 @@
+export type Photo = { src: string; alt: string; title: string; ratio: number }
+
+export const PHOTOS: Photo[] = [
+  { src: "/assets/photos/forweb/01.webp", title: "Langit senja", alt: "Langit mendung keabu-biruan di area terbuka", ratio: 0.749 },
+  { src: "/assets/photos/forweb/02.webp", title: "Bulan Malam", alt: "Bulan di balik siluet pepohonan pada malam hari", ratio: 0.8 },
+  { src: "/assets/photos/forweb/03.webp", title: "Senja Jingga", alt: "Langit senja jingga di atas ladang", ratio: 0.8 },
+  { src: "/assets/photos/forweb/04.webp", title: "Senja di Atas Sawah", alt: "Langit senja biru dan jingga di atas sawah", ratio: 0.8 },
+  { src: "/assets/photos/forweb/05.webp", title: "Daun Rambat", alt: "Daun tumbuhan merambat dengan latar langit siang", ratio: 0.8 },
+  { src: "/assets/photos/forweb/06.webp", title: "Polo", alt: "Pemain polo berkuda di lapangan rumput, siang hari", ratio: 0.666 },
+  { src: "/assets/photos/forweb/07.webp", title: "Candi", alt: "Bangunan candi batu di tengah hutan, siang hari", ratio: 0.562 },
+  { src: "/assets/photos/forweb/08.webp", title: "Kucing Paving", alt: "Kucing kecil di atas permukaan paving saat mendung", ratio: 0.562 },
+  { src: "/assets/photos/forweb/09.webp", title: "Mobil Oranye", alt: "Mobil sport oranye di jalanan, siang hari", ratio: 0.667 },
+  { src: "/assets/photos/forweb/10.webp", title: "Jalan Berkelok", alt: "Jalan berkelok di antara pepohonan, cahaya siang", ratio: 0.8 },
+  { src: "/assets/photos/forweb/11.webp", title: "Bougenville", alt: "Bunga bougenville oranye dengan latar hijau", ratio: 0.562 },
+  { src: "/assets/photos/forweb/12.webp", title: "Kucing Oranye", alt: "Kucing oranye di semak taman dengan bayangan siang", ratio: 0.8 },
+  { src: "/assets/photos/forweb/13.webp", title: "Motor di Sawah", alt: "Motor sport di jalan setapak pinggir sawah, sore", ratio: 0.562 },
+  { src: "/assets/photos/forweb/14.webp", title: "Awan Kumulus", alt: "Awan kumulus di langit biru, siang hari", ratio: 0.562 },
+  { src: "/assets/photos/forweb/15.webp", title: "Menara Senja", alt: "Menara telekomunikasi di area sawah saat senja", ratio: 0.562 },
+  { src: "/assets/photos/forweb/16.webp", title: "Membaca", alt: "Seseorang membaca buku di dalam ruangan", ratio: 1.25 },
+  { src: "/assets/photos/forweb/17.webp", title: "Rusa", alt: "Dua ekor rusa besar di padang rumput, siang hari", ratio: 1.5 },
+  { src: "/assets/photos/forweb/18.webp", title: "Pakis", alt: "Tanaman pakis dan vegetasi hutan, hijau dominan", ratio: 0.8 },
+  { src: "/assets/photos/forweb/19.webp", title: "Kabut Pagi", alt: "Motor di jalan berkabut pinggir sawah, pagi hari", ratio: 0.562 },
+  { src: "/assets/photos/forweb/20.webp", title: "Rumah Danau", alt: "Rumah di tepi danau dikelilingi hutan lebat", ratio: 0.562 },
+  { src: "/assets/photos/forweb/21.webp", title: "Tebing", alt: "Bangunan di atas tebing dengan cahaya pagi", ratio: 0.562 },
+  { src: "/assets/photos/forweb/22.webp", title: "Sacré-Cœur", alt: "Basilika Sacré-Cœur di Paris, langit cerah", ratio: 0.562 },
+  { src: "/assets/photos/forweb/23.webp", title: "Anjing di Dahan", alt: "Anjing di atas dahan pohon di tepi danau", ratio: 0.562 },
+]

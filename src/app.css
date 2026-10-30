@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #1a1a1a;
+  --ink: #f5f5f5;
+  --ink-soft: rgba(245, 245, 245, 0.62);
+  --ink-faint: rgba(245, 245, 245, 0.55);
+  --line: rgba(255, 255, 255, 0.08);
+  --accent: #c83e31;
+  --accent-text: #f08a78;
+}
+
+@theme inline {
+  --color-bg: var(--bg, #0a0a0a);
+  --color-surface: var(--surface, #141414);
+  --color-surface-2: var(--surface-2, #1a1a1a);
+  --color-ink: var(--ink, #f5f5f5);
+  --color-ink-soft: var(--ink-soft, rgba(245,245,245,.62));
+  --color-ink-faint: var(--ink-faint, rgba(245,245,245,.55));
+  --color-line: var(--line, rgba(255,255,255,.08));
+  --color-accent: var(--accent, #c83e31);
+  --color-accent-text: var(--accent-text, #f08a78);
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: var(--bg);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: 4px;
+  }
+
+  h1,
+  h2,
+  h3,
+  .display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* Muncul saat masuk viewport. Tanpa JS tetap terbaca. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
+
+
+/* --- Baris foto berjalan (kanan ke kiri) ------------------------------- */
+.photo-marquee {
+  --photo-h: 320px;
+  overflow: hidden;
+  /* tepi kiri-kanan luruh, jadi barisnya tidak tampak terpotong */
+  mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%);
+}
+
+.photo-track {
+  display: flex;
+  width: max-content;
+  animation: photo-drift 120s linear infinite;
+  will-change: transform;
+}
+
+.photo-group {
+  display: flex;
+  gap: 14px;
+  padding-right: 14px;
+}
+
+.photo-item {
+  flex: 0 0 auto;
+  height: var(--photo-h);
+  margin: 0;
+}
+
+.photo-item img {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 3px;
+}
+
+.photo-marquee:hover .photo-track,
+.photo-marquee:focus-within .photo-track {
+  animation-play-state: paused;
+}
+
+@keyframes photo-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+@media (max-width: 768px) {
+  .photo-marquee { --photo-h: 210px; }
+  .photo-group { gap: 10px; padding-right: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-track { animation: none; }
+  .photo-marquee {
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+}
