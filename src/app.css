@@ -1,5 +1,28 @@
 @import "tailwindcss";
 
+/* Font di-host sendiri (bukan Google Fonts) supaya tidak ada stylesheet
+   pihak ketiga yang memblokir render. Dua berkas saja, sudah di-subset ke
+   rentang karakter yang dipakai situs ini (Latin, Latin-ext, tanda baca).
+
+   Fraunces di-instance di wght 300 karena seluruh teks display memakai
+   font-light; sumbu opsz (optical size) tetap hidup. Inter Tight tetap
+   variable untuk 400/500. */
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/fraunces-300.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("/fonts/inter-tight.woff2") format("woff2");
+}
+
+
 :root {
   --bg: #0a0a0a;
   --surface: #141414;

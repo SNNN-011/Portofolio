@@ -59,6 +59,7 @@ src/
   docs/                           gambar pratinjau untuk README (bukan bagian app)
 public/
   assets/photos/                  foto galeri (.webp)
+  fonts/                          Fraunces + Inter Tight (subset, self-host)
   icon-*.png                      favicon dari logo Y
 ```
 
@@ -68,7 +69,9 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, navbar, carousel)
 
 - **Berkas laser.** Satu shader `LaserFlow` di `ui/laser-flow/LaserFlow.jsx`. Untuk kartu unggulan, kanvasnya dipasang selebar layar mulai dari bawah hero sampai ±560px di bawah kartu, dengan `mask-image` supaya ujungnya tidak terpotong. Di bawah tepi kartu, bentuk tumpahan "dibekukan" pada tinggi tepi lalu dilanjutkan dengan `fall` yang bertambah, sehingga cahayanya turun dan melebar natural, tanpa menyorot garis bawah kartu atau kartu proyek di bawahnya.
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
-- **Font** dimuat dari Google Fonts; teks utama pakai Fraunces (display) dan Inter Tight (UI).
+- **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
+- **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport. Foto galeri (±2,9 MB) tidak diunduh sebelum pengguna mendekati seksi Foto.
+- **Bundel awal** hanya berisi React, navbar kaca, host black hole, dan konten teks (±100 KB gzip); sisa efek masuk chunk terpisah.
 
 ## Deploy
 

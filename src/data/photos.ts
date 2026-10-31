@@ -26,7 +26,7 @@ const PHOTO_LIST: Photo[] = [
   { src: "/assets/photos/forweb/19.webp", title: "Kabut Pagi", alt: "Motor di jalan berkabut pinggir sawah, pagi hari", ratio: 0.562 },
   { src: "/assets/photos/forweb/20.webp", title: "Rumah Danau", alt: "Rumah di tepi danau dikelilingi hutan lebat", ratio: 0.562 },
   { src: "/assets/photos/forweb/21.webp", title: "Tebing", alt: "Bangunan di atas tebing dengan cahaya pagi", ratio: 0.562 },
-  { src: "/assets/photos/forweb/22.webp", title: "SacrÃ©-CÅ“ur", alt: "Basilika SacrÃ©-CÅ“ur di Paris, langit cerah", ratio: 0.562 },
+  { src: "/assets/photos/forweb/22.webp", title: "Sacré-Cœur", alt: "Basilika Sacré-Cœur di Paris, langit cerah", ratio: 0.562 },
   { src: "/assets/photos/forweb/23.webp", title: "Anjing di Dahan", alt: "Anjing di atas dahan pohon di tepi danau", ratio: 0.562 },
 ]
 

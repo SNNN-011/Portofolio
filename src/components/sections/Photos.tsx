@@ -1,13 +1,45 @@
 import * as React from "react"
-import FlexCarouselSrc from "@/components/ui/flex-carousel/FlexCarousel"
 import { PHOTOS } from "@/data/photos"
 
-// Komponen aslinya .jsx tanpa tipe; propertinya dibuka di sini.
-const FlexCarousel = FlexCarouselSrc as unknown as React.ComponentType<Record<string, unknown>>
+// Carousel-nya WebGL dan memuat 23 tekstur foto (~2,9 MB). Diimpor dinamis
+// supaya bundel awal tetap kecil dan fotonya baru diunduh saat mendekati galeri.
+const FlexCarousel = React.lazy(async () => {
+  const mod = await import("@/components/ui/flex-carousel/FlexCarousel")
+  return { default: mod.default as unknown as React.ComponentType<Record<string, unknown>> }
+})
 
 const LABEL = "text-[11px] uppercase tracking-[0.18em] text-ink-faint"
 
+/** Pasang isi berat setelah elemennya mendekati viewport. */
+function useNearViewport<T extends HTMLElement>(rootMargin = "800px 0px") {
+  const ref = React.useRef<T>(null)
+  const [near, setNear] = React.useState(false)
+
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (!("IntersectionObserver" in window)) {
+      setNear(true)
+      return
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        setNear(true)
+        io.disconnect()
+      },
+      { rootMargin }
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [rootMargin])
+
+  return [ref, near] as const
+}
+
 export function Photos() {
+  const [stageRef, near] = useNearViewport<HTMLDivElement>()
+
   return (
     <section id="foto" className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-32">
       <div className="grid gap-10 md:grid-cols-12 md:gap-8">
@@ -25,22 +57,26 @@ export function Photos() {
 
       {/* Digeser sedikit ke atas: judulnya kini 3 baris, jadi tanpa ini kartu
           foto terdorong turun dan kepotong di bawah lipatan layar. */}
-      <div className="relative -mt-4 h-[520px] md:-mt-24 md:h-[760px]">
-        <FlexCarousel
-          items={PHOTOS}
-          preset="liquid"
-          intro="none"
-          cardHeight={0.55}
-          gap={12}
-          radius={14}
-          squeeze={0.2}
-          bend={0.2}
-          focusOnClick
-          captions
-          captureWheel={false}
-          autoplay
-          interval={2.6}
-        />
+      <div ref={stageRef} className="relative -mt-4 h-[520px] md:-mt-24 md:h-[760px]">
+        {near && (
+          <React.Suspense fallback={null}>
+            <FlexCarousel
+              items={PHOTOS}
+              preset="liquid"
+              intro="none"
+              cardHeight={0.55}
+              gap={12}
+              radius={14}
+              squeeze={0.2}
+              bend={0.2}
+              focusOnClick
+              captions
+              captureWheel={false}
+              autoplay
+              interval={2.6}
+            />
+          </React.Suspense>
+        )}
       </div>
     </section>
   )

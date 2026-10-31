@@ -1,8 +1,11 @@
 import * as React from "react"
-import LaserFlowSrc from "@/components/ui/laser-flow/LaserFlow"
 
-// Komponen aslinya .jsx tanpa tipe; propertinya dibuka di sini.
-const LaserFlow = LaserFlowSrc as unknown as React.ComponentType<Record<string, unknown>>
+// Shader LaserFlow tetap diunduh terpisah: kanvasnya baru relevan saat kartu
+// unggulan mendekat, jadi tidak perlu ikut bundel awal.
+const LaserFlow = React.lazy(async () => {
+  const mod = await import("@/components/ui/laser-flow/LaserFlow")
+  return { default: mod.default as unknown as React.ComponentType<Record<string, unknown>> }
+})
 
 /** Ruang kanvas di atas kartu pada versi acuan (tampilan yang sudah disetujui). */
 const REF_HEADROOM = 340
@@ -39,6 +42,7 @@ const shaderScale = (width: number, height: number) =>
 export function LaserCardLayer() {
   const cardRef = React.useRef<HTMLElement | null>(null)
   const [box, setBox] = React.useState<Box | null>(null)
+  const [armed, setArmed] = React.useState(false)
 
   React.useEffect(() => {
     const card = document.getElementById("nano-money-card")
@@ -46,7 +50,29 @@ export function LaserCardLayer() {
     cardRef.current = card
     const hero = document.getElementById("atas")
 
+    // Berkas baru dipasang saat kartu sudah dekat; sebelum itu tidak ada yang
+    // perlu digambar, jadi shader-nya pun tidak diunduh.
     let timer = 0
+    let armTimer = 0
+    let armedIo: IntersectionObserver | undefined
+    if (typeof IntersectionObserver === "undefined") {
+      setArmed(true)
+      armTimer = window.setTimeout(() => measure(), 700)
+    } else {
+      armedIo = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return
+          setArmed(true)
+          armedIo?.disconnect()
+          // Reveal kartu berjalan 0,6 dtk dan menggeser posisinya; ukur ulang
+          // setelah animasi selesai — bukan tiap kali halaman di-scroll.
+          armTimer = window.setTimeout(() => measure(), 700)
+        },
+        { rootMargin: "80% 0px" }
+      )
+      armedIo.observe(card)
+    }
+
     const measure = () => {
       const rect = card.getBoundingClientRect()
       const width = Math.max(1, document.documentElement.clientWidth)
@@ -87,20 +113,18 @@ export function LaserCardLayer() {
     const ro = new ResizeObserver(schedule)
     ro.observe(document.body)
     window.addEventListener("resize", schedule)
-    // Posisi kartu bergeser saat animasi reveal berjalan dan saat halaman
-    // di-scroll, jadi ukur ulang — kalau tidak, sinar mendarat di koordinat lama.
-    window.addEventListener("scroll", schedule, { passive: true })
 
     return () => {
       window.clearTimeout(settle)
       window.clearTimeout(timer)
+      window.clearTimeout(armTimer)
       ro.disconnect()
+      armedIo?.disconnect()
       window.removeEventListener("resize", schedule)
-      window.removeEventListener("scroll", schedule)
     }
   }, [])
 
-  if (!box) return null
+  if (!box || !armed) return null
 
   return (
     <div
@@ -117,28 +141,30 @@ export function LaserCardLayer() {
           "linear-gradient(to bottom, transparent 0, #000 160px, #000 calc(100% - 260px), transparent 100%)",
       }}
     >
-      <LaserFlow
-        surfaceRef={cardRef}
-        beamPosition={box.beam}
-        color="#ffffff"
-        intensity={0.65}
-        beamWidth={REF.beamWidth / box.k}
-        flare={REF.flare / box.k}
-        spread={0.75}
-        spill={REF.spill / box.k}
-        fog={0.2}
-        dust={1.35}
-        streaks={2}
-        dots={1.9}
-        pulse={1.3}
-        speed={2.1}
-        seed={2}
-        mouseInteraction
-        revealRadius={200}
-        revealOpacity={0.5}
-        theme="dark"
-        intro={false}
-      />
+      <React.Suspense fallback={null}>
+        <LaserFlow
+          surfaceRef={cardRef}
+          beamPosition={box.beam}
+          color="#ffffff"
+          intensity={0.65}
+          beamWidth={REF.beamWidth / box.k}
+          flare={REF.flare / box.k}
+          spread={0.75}
+          spill={REF.spill / box.k}
+          fog={0.2}
+          dust={1.35}
+          streaks={2}
+          dots={1.9}
+          pulse={1.3}
+          speed={2.1}
+          seed={2}
+          mouseInteraction
+          revealRadius={200}
+          revealOpacity={0.5}
+          theme="dark"
+          intro={false}
+        />
+      </React.Suspense>
     </div>
   )
 }
