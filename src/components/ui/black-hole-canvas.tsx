@@ -1,6 +1,9 @@
 import * as React from "react"
 import { createRenderer } from "./black-hole/renderer"
 
+/** Aset publik harus ikut `base` supaya jalan di sub-path GitHub Pages. */
+const POSTER_BASE = `${import.meta.env.BASE_URL}assets/black-hole/`
+
 /**
  * Host untuk contoh vgpu "optimized-black-hole".
  * Sumber di ./black-hole/ diambil apa adanya dari manifest vgpu.sh dan
@@ -57,11 +60,24 @@ export function BlackHoleCanvas() {
 
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#060708]">
-      {/* cadangan saat WebGPU tidak ada: gradien netral, tanpa warna hangat */}
+      {/* cadangan terakhir kalau poster pun gagal dimuat */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_62%_38%,rgba(255,255,255,0.06),transparent_55%)]" />
+      {/* Poster dirender dari efek aslinya: langsung tampil selagi WebGPU
+          menyiapkan shader, dan menjadi tampilan final di perangkat tanpa
+          WebGPU / dengan reduced-motion. */}
+      <picture>
+        <source media="(max-width: 767px)" srcSet={`${POSTER_BASE}poster-mobile.webp`} />
+        <img
+          src={`${POSTER_BASE}poster-desktop.webp`}
+          alt=""
+          decoding="async"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </picture>
       <canvas
         ref={canvasRef}
-        className={`block h-full w-full touch-none transition-opacity duration-700 ${live ? "opacity-100" : "opacity-0"}`}
+        className={`relative block h-full w-full touch-none transition-opacity duration-700 ${live ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   )

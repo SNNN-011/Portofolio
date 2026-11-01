@@ -18,7 +18,7 @@ Situs portofolio satu halaman: profil, lima proyek (mobile AI, fine-tuned SLM, c
 
 | Seksi | Isi |
 | --- | --- |
-| **Hero** | Nama besar, latar black hole (WebGPU) dengan fallback gradien statis |
+| **Hero** | Nama besar, latar black hole (WebGPU) dengan poster fallback untuk perangkat tanpa WebGPU |
 | **Profil & Pendekatan** | Ringkasan singkat cara kerja dan latar studi |
 | **Karya** | Kartu 5 proyek dengan pratinjau potongan cara pakai; kartu unggulan disinari berkas laser |
 | **Foto** | Galeri geser (drag/wheel/klik) berisi hasil color grading |
@@ -60,12 +60,13 @@ src/
     ui/project-previews.tsx       5 pratinjau use-case per proyek
   docs/                           gambar pratinjau untuk README (bukan bagian app)
 public/
+  assets/black-hole/              poster hero (fallback + paint pertama)
   assets/photos/                  foto galeri (.webp); forweb/small/ = varian HP
   fonts/                          Fraunces + Inter Tight (subset, self-host)
   icon-*.png                      favicon dari logo Y
 ```
 
-Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **WebGPU** (black hole). Keduanya punya jalur cadangan — shader laser dilewati kalau WebGL2 tidak tersedia, dan black hole jatuh ke lapisan gradien.
+Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **WebGPU** (black hole). Keduanya punya jalur cadangan — shader laser dilewati kalau WebGL2 tidak tersedia, dan black hole memakai poster statis (hasil render efek yang sama) kalau WebGPU tidak ada, `requestAdapter()` gagal, atau pengguna meminta reduced-motion.
 
 ## Catatan teknis
 
@@ -73,6 +74,7 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **W
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
 - **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
 - **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport (250px). Foto galeri tidak diunduh sebelum pengguna mendekati seksi Foto; di layar sempit dipakai varian `forweb/small/` (±1,7 MB, bukan ±2,9 MB), dan teksturnya diperkecil sebelum masuk GPU.
+- **Poster black hole.** `public/assets/black-hole/` berisi dua poster (desktop 51 KB, HP 13 KB) yang dirender dari efek aslinya. Poster tampil langsung sejak paint pertama, jadi layar tidak kosong selama WebGPU mengompilasi shader; canvas live memudar di atasnya saat siap. Di perangkat tanpa WebGPU poster itu yang jadi tampilan final, bukan gradien polos.
 - **Efek hemat di HP, tampilan tetap sama.** Black hole merender di 0,75 skala internal (0,6 untuk perangkat kelas bawah), dibatasi 30fps, dan punya penyesuaian otomatis: kalau frame lambat berturut-turut resolusinya turun, kalau sudah longgar naik lagi (lihat `black-hole/quality.ts`). Laser memakai batas resolusi 1600px dan 30fps di HP. Carousel mematikan autoplay di HP (geser manual tetap jalan) dan mengunggah tekstur maksimal 1000px.
 - **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) dipisah ke repo sendiri, [SNNN-011/liquid-navbar](https://github.com/SNNN-011/liquid-navbar), lengkap dengan demo; salinannya tetap ada di sini, cukup tukar impornya di `src/App.tsx` untuk memakai lagi. Aset foto mentah yang tidak terpakai dan `logo-y.png` sudah dihapus dari `public/`.
 - **Bundel awal** hanya berisi React, host black hole, dan konten teks (±93 KB gzip); sisa efek masuk chunk terpisah.
