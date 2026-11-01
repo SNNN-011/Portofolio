@@ -24,7 +24,7 @@ Situs portofolio satu halaman: profil, lima proyek (mobile AI, fine-tuned SLM, c
 | **Foto** | Galeri geser (drag/wheel/klik) berisi hasil color grading |
 | **Kontak** | Tautan sosial dan email |
 
-Navigasi memakai pill polos (`NavPill`) yang mengikuti seksi aktif; di mobile berubah jadi bar ikon. Versi kaca dengan shader air WebGL (`LiquidNavbar`) masih tersimpan di repo tapi tidak dipasang lagi.
+Navigasi memakai pill polos (`NavPill`) yang mengikuti seksi aktif; di mobile berubah jadi bar ikon. Versi kaca dengan shader air WebGL (`LiquidNavbar`) dipisah ke [repo sendiri](https://github.com/SNNN-011/liquid-navbar) dan tidak dipasang lagi di sini.
 
 ## Menjalankan
 
@@ -50,7 +50,7 @@ src/
     sections/Projects.tsx         grid kartu proyek
     sections/Photos.tsx           pembungkus galeri
     ui/nav-pill.tsx               navbar pill polos (dipakai)
-    ui/liquid-glass-navbar.tsx    navbar kaca + shader air WebGL (disimpan, tidak diimpor)
+    ui/liquid-glass-navbar.tsx    navbar kaca + shader air WebGL (disimpan; repo terpisah)
     ui/black-hole-canvas.tsx      host WebGPU untuk latar hero
     ui/black-hole/                sumber contoh vgpu (dipakai apa adanya)
     ui/laser-card-layer.tsx       penempatan berkas laser di kartu unggulan
@@ -72,7 +72,7 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **W
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
 - **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
 - **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport. Foto galeri (±2,9 MB) tidak diunduh sebelum pengguna mendekati seksi Foto.
-- **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) tetap utuh di repo; untuk memakainya lagi, tukar impornya di `src/App.tsx`.
+- **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) dipisah ke repo sendiri, [SNNN-011/liquid-navbar](https://github.com/SNNN-011/liquid-navbar), lengkap dengan demo; salinannya tetap ada di sini, cukup tukar impornya di `src/App.tsx` untuk memakai lagi.
 - **Bundel awal** hanya berisi React, host black hole, dan konten teks (±93 KB gzip); sisa efek masuk chunk terpisah.
 
 ## Deploy
