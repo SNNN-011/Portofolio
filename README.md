@@ -24,7 +24,7 @@ Situs portofolio satu halaman: profil, lima proyek (mobile AI, fine-tuned SLM, c
 | **Foto** | Galeri geser (drag/wheel/klik) berisi hasil color grading |
 | **Kontak** | Tautan sosial dan email |
 
-Navigasi memakai pill kaca (`LiquidNavbar`) yang mengikuti seksi aktif; di mobile berubah jadi bar ikon.
+Navigasi memakai pill polos (`NavPill`) yang mengikuti seksi aktif; di mobile berubah jadi bar ikon. Versi kaca dengan shader air WebGL (`LiquidNavbar`) masih tersimpan di repo tapi tidak dipasang lagi.
 
 ## Menjalankan
 
@@ -49,7 +49,8 @@ src/
     sections/Home.tsx             hero, profil, karya, foto, kontak
     sections/Projects.tsx         grid kartu proyek
     sections/Photos.tsx           pembungkus galeri
-    ui/liquid-glass-navbar.tsx    navbar kaca dengan shader air WebGL
+    ui/nav-pill.tsx               navbar pill polos (dipakai)
+    ui/liquid-glass-navbar.tsx    navbar kaca + shader air WebGL (disimpan, tidak diimpor)
     ui/black-hole-canvas.tsx      host WebGPU untuk latar hero
     ui/black-hole/                sumber contoh vgpu (dipakai apa adanya)
     ui/laser-card-layer.tsx       penempatan berkas laser di kartu unggulan
@@ -63,7 +64,7 @@ public/
   icon-*.png                      favicon dari logo Y
 ```
 
-Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, navbar, carousel) dan **WebGPU** (black hole). Keduanya punya jalur cadangan — navbar punya style CSS saat `data-gl="off"`, black hole jatuh ke lapisan gradien, dan shader laser dilewati kalau WebGL2 tidak tersedia.
+Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **WebGPU** (black hole). Keduanya punya jalur cadangan — shader laser dilewati kalau WebGL2 tidak tersedia, dan black hole jatuh ke lapisan gradien.
 
 ## Catatan teknis
 
@@ -71,7 +72,8 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, navbar, carousel)
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
 - **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
 - **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport. Foto galeri (±2,9 MB) tidak diunduh sebelum pengguna mendekati seksi Foto.
-- **Bundel awal** hanya berisi React, navbar kaca, host black hole, dan konten teks (±100 KB gzip); sisa efek masuk chunk terpisah.
+- **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) tetap utuh di repo; untuk memakainya lagi, tukar impornya di `src/App.tsx`.
+- **Bundel awal** hanya berisi React, host black hole, dan konten teks (±93 KB gzip); sisa efek masuk chunk terpisah.
 
 ## Deploy
 
