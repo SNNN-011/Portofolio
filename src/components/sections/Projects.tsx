@@ -34,7 +34,7 @@ function Body({ p }: { p: Project }) {
   return (
     <>
       <p className="text-[11px] uppercase tracking-[0.16em] text-ink-faint">{p.badge}</p>
-      <h3 className="mt-3 font-display text-[clamp(1.5rem,2.4vw,2rem)] font-light leading-tight tracking-[-0.03em] text-ink">{p.name}</h3>
+      <h3 className="mt-3 font-display text-[clamp(1.5rem,2.4vw,2rem)] font-bold leading-tight tracking-[-0.03em] text-ink">{p.name}</h3>
       <p className="mt-2 text-[13.5px] text-ink-soft">{p.tagline}</p>
       <p className="mt-3 text-[13.5px] leading-[1.7] text-ink-soft">{p.description}</p>
       <Stack items={p.stack} />
@@ -53,7 +53,7 @@ export function Projects() {
         <p className={`${LABEL} md:col-span-3`}>Karya</p>
 
         <div className="md:col-span-10">
-          <h2 data-reveal className="font-display text-[clamp(1.9rem,3.6vw,2.9rem)] font-light tracking-[-0.03em] text-ink">
+          <h2 data-reveal className="font-display text-[clamp(1.9rem,3.6vw,2.9rem)] font-bold tracking-[-0.03em] text-ink">
             Lima proyek, semuanya bisa dibaca kodenya.
           </h2>
           <p data-reveal className="mt-4 max-w-xl text-[15px] leading-[1.75] text-ink-soft">

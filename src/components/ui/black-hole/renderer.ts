@@ -56,6 +56,7 @@ export function createRenderer({ canvas }: RendererOptions) {
     cameraRoll: settings.cameraRoll,
     mouseYaw: settings.mouseYaw,
     centerFade: settings.centerFade,
+    fov: settings.fov,
   };
   const mobileQuery = window.matchMedia(MOBILE_QUERY);
   const applyResponsiveLayout = () => {
@@ -67,6 +68,9 @@ export function createRenderer({ canvas }: RendererOptions) {
             centerY: 0,
             cameraRoll: 0,
             mouseYaw: 0,
+            // Layar portrait menyempitkan sudut pandang horizontal; fov dikecilkan
+            // supaya black hole tidak memenuhi seluruh lebar layar.
+            fov: 2.1,
             centerFade: 1,
           }
         : desktopLayout
