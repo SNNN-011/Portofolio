@@ -1,19 +1,18 @@
 @import "tailwindcss";
 
 /* Font di-host sendiri (bukan Google Fonts) supaya tidak ada stylesheet
-   pihak ketiga yang memblokir render.
+   pihak ketiga yang memblokir render. Dua berkas saja, sudah di-subset ke
+   rentang karakter yang dipakai situs ini (Latin, Latin-ext, tanda baca).
 
-   Boska (Fontshare/ITF, gratis untuk personal & komersial) dipakai sebagai
-   pengganti "Collapse Bold" yang komersial: sama-sama serif display kontras
-   tinggi, sempit, dengan serif tajam. Cuma ada satu bobot (700) karena semua
-   teks display memang bold.
-   Inter Tight tetap variable untuk 400/500. */
+   Fraunces di-instance di wght 300 karena seluruh teks display memakai
+   font-light; sumbu opsz (optical size) tetap hidup. Inter Tight tetap
+   variable untuk 400/500. */
 @font-face {
-  font-family: "Boska";
+  font-family: "Fraunces";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 300;
   font-display: swap;
-  src: url("/fonts/boska-700.woff2") format("woff2");
+  src: url("/fonts/fraunces-300.woff2") format("woff2");
 }
 @font-face {
   font-family: "Inter Tight";
@@ -46,7 +45,7 @@
   --color-line: var(--line, rgba(255,255,255,.08));
   --color-accent: var(--accent, #c83e31);
   --color-accent-text: var(--accent-text, #f08a78);
-  --font-display: "Boska", ui-serif, Georgia, serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
   --font-sans: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -80,8 +79,8 @@
   h3,
   .display {
     font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-weight: 300;
+    letter-spacing: -0.03em;
     line-height: 1.08;
     text-wrap: balance;
   }

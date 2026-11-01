@@ -50,7 +50,7 @@ export function Photos() {
       <div className="grid gap-10 md:grid-cols-12 md:gap-8">
         <p className={`${LABEL} md:col-span-3`}>Foto</p>
         <div className="md:col-span-10">
-          <h2 data-reveal className="max-w-2xl font-display text-[clamp(1.9rem,3.6vw,2.9rem)] font-bold tracking-[-0.03em] text-ink">
+          <h2 data-reveal className="max-w-2xl font-display text-[clamp(1.9rem,3.6vw,2.9rem)] font-light tracking-[-0.03em] text-ink">
             Mengolah file mentah menjadi visual yang punya suasana, lewat Lightroom dan Photoshop.
           </h2>
           <p data-reveal className="mt-3 max-w-xl text-[15px] leading-[1.75] text-ink-soft">

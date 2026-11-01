@@ -42,7 +42,7 @@ npm run preview  # cek hasil build
 ```
 src/
   App.tsx                         susun navbar + layer laser + Home
-  app.css                         token warna, font (Boska + Inter Tight), animasi reveal
+  app.css                         token warna, font (Fraunces + Inter Tight), animasi reveal
   data/projects.ts                5 proyek: nama, tagline, stack, repo
   data/photos.ts                  23 foto galeri
   components/
@@ -62,7 +62,7 @@ src/
 public/
   assets/black-hole/              poster hero (fallback + paint pertama)
   assets/photos/                  foto galeri (.webp); forweb/small/ = varian HP
-  fonts/                          Boska (display) + Inter Tight (self-host)
+  fonts/                          Fraunces + Inter Tight (subset, self-host)
   icon-*.png                      favicon dari logo Y
 ```
 
@@ -72,7 +72,7 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **W
 
 - **Berkas laser.** Satu shader `LaserFlow` di `ui/laser-flow/LaserFlow.jsx`. Untuk kartu unggulan, kanvasnya dipasang selebar layar mulai dari bawah hero sampai ±560px di bawah kartu, dengan `mask-image` supaya ujungnya tidak terpotong. Di bawah tepi kartu, bentuk tumpahan "dibekukan" pada tinggi tepi lalu dilanjutkan dengan `fall` yang bertambah, sehingga cahayanya turun dan melebar natural, tanpa menyorot garis bawah kartu atau kartu proyek di bawahnya.
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
-- **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: **Boska** untuk semua teks display (serif kontras tinggi, sempit, satu bobot 700) sebagai padanan gratis dari "Collapse Bold" yang komersial — lisensi Fontshare/ITF, gratis untuk personal maupun komersial; **Inter Tight** variable untuk teks UI di 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
+- **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
 - **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport (250px). Foto galeri tidak diunduh sebelum pengguna mendekati seksi Foto; di layar sempit dipakai varian `forweb/small/` (±1,7 MB, bukan ±2,9 MB), dan teksturnya diperkecil sebelum masuk GPU.
 - **Poster black hole.** `public/assets/black-hole/` berisi dua poster (desktop 51 KB, HP 13 KB) yang dirender dari efek aslinya. Poster tampil langsung sejak paint pertama, jadi layar tidak kosong selama WebGPU mengompilasi shader; canvas live memudar di atasnya saat siap. Di perangkat tanpa WebGPU poster itu yang jadi tampilan final, bukan gradien polos.
 - **Efek hemat di HP, tampilan tetap sama.** Black hole merender di 0,75 skala internal (0,6 untuk perangkat kelas bawah), dibatasi 30fps, dan punya penyesuaian otomatis: kalau frame lambat berturut-turut resolusinya turun, kalau sudah longgar naik lagi (lihat `black-hole/quality.ts`). Laser memakai batas resolusi 1600px dan 30fps di HP. Carousel mematikan autoplay di HP (geser manual tetap jalan) dan mengunggah tekstur maksimal 1000px.

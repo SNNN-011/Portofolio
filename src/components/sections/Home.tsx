@@ -40,7 +40,7 @@ export function Home() {
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-[42vh] bg-gradient-to-b from-transparent via-bg/70 to-bg" />
 
         <div className="relative mx-auto flex min-h-[100svh] max-w-[1400px] flex-col justify-end px-6 pb-10 pt-28 md:px-10">
-          <h1 className="font-display text-[clamp(3.6rem,15vw,12rem)] font-bold leading-[0.86] tracking-[-0.045em] text-white">
+          <h1 className="font-display text-[clamp(3.6rem,15vw,12rem)] font-light leading-[0.86] tracking-[-0.045em] text-white">
             Yasin Anr
           </h1>
 
@@ -61,7 +61,7 @@ export function Home() {
           <p className={`${LABEL} md:col-span-3`}>Profil</p>
 
           <div className="md:col-span-10">
-            <p data-reveal className="max-w-4xl font-display text-[clamp(1.55rem,3.2vw,2.6rem)] font-bold leading-[1.22] tracking-[-0.02em] text-ink">
+            <p data-reveal className="max-w-4xl font-display text-[clamp(1.55rem,3.2vw,2.6rem)] font-light leading-[1.22] tracking-[-0.02em] text-ink">
               Building smart web and mobile apps—menggabungkan fondasi software engineering dengan kapabilitas AI modern.
             </p>
           </div>
@@ -102,7 +102,7 @@ export function Home() {
             <a
               data-reveal
               href="mailto:myasinaldinar@gmail.com"
-              className="inline-block font-display text-[clamp(1.6rem,4.4vw,3.4rem)] font-bold leading-[1.1] tracking-[-0.03em] text-ink transition-colors hover:text-accent"
+              className="inline-block font-display text-[clamp(1.6rem,4.4vw,3.4rem)] font-light leading-[1.1] tracking-[-0.03em] text-ink transition-colors hover:text-accent"
             >
               myasinaldinar@gmail.com
             </a>
