@@ -96,6 +96,13 @@ const BEND_PRESETS = {
 const FIT_ASPECT = { portrait: 0.75, square: 1, landscape: 4 / 3 };
 const TAPS = 12;
 const PIXEL_BUDGET = 4.5e6;
+// Tekstur foto diperkecil sebelum di-upload. File aslinya tetap dipakai untuk
+// rasio; yang turun hanya resolusi tekstur GPU. Di HP batasnya lebih kecil.
+const MOBILE_QUERY = '(max-width: 767px), (pointer: coarse)';
+const IS_MOBILE = typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches;
+const TEXTURE_MAX_SIDE = IS_MOBILE ? 1000 : 1400;
+const FIRST_LOAD_BATCH = 8;
+const LOAD_STAGGER_MS = IS_MOBILE ? 220 : 110;
 const INTRO_DURATION = { rise: 2.1, bloom: 1.6, spin: 2.2, deal: 1.5, fade: 0.35 };
 
 const wrap = (value, size) => ((((value + size / 2) % size) + size) % size) - size / 2;
@@ -459,6 +466,24 @@ const FlexCarousel = ({
     const focus = { index: -1, pending: -1, t: 0, v: 0, target: 0 };
     let instances = [];
 
+    /** Kecilkan foto ke batas tekstur supaya VRAM tidak meledak di HP. */
+    const shrink = image => {
+      const width = image.naturalWidth || image.width || 1;
+      const height = image.naturalHeight || image.height || 1;
+      const longest = Math.max(width, height);
+      if (longest <= TEXTURE_MAX_SIDE) return image;
+      const k = TEXTURE_MAX_SIDE / longest;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(width * k));
+      canvas.height = Math.max(1, Math.round(height * k));
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return image;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return canvas;
+    };
+
     const loadSlot = (item, index) => {
       const texture = new Texture(gl, {
         generateMipmaps: true,
@@ -476,6 +501,7 @@ const FlexCarousel = ({
         ready: 0,
         color: [0.5, 0.5, 0.5],
         image: [1, 1],
+        loadTimer: 0,
         dispose: () => {}
       };
       const image = new Image();
@@ -483,7 +509,7 @@ const FlexCarousel = ({
       image.decoding = 'async';
       image.onload = () => {
         if (!alive || !slots.includes(slot)) return;
-        texture.image = image;
+        texture.image = shrink(image);
         texture.update();
         slot.image = [image.naturalWidth || 1, image.naturalHeight || 1];
         slot.aspect = slot.image[0] / slot.image[1];
@@ -516,8 +542,13 @@ const FlexCarousel = ({
         dirty = true;
         start();
       };
-      image.src = item.src;
+      // Batch pertama langsung; sisanya dijadwalkan supaya decode 23 foto
+      // tidak menumpuk dalam satu frame.
+      const delay = index < FIRST_LOAD_BATCH ? 0 : (index - FIRST_LOAD_BATCH + 1) * LOAD_STAGGER_MS;
+      if (delay === 0) image.src = item.src;
+      else slot.loadTimer = window.setTimeout(() => { image.src = item.src; }, delay);
       slot.dispose = () => {
+        if (slot.loadTimer) window.clearTimeout(slot.loadTimer);
         image.onload = null;
         image.onerror = null;
         gl.deleteTexture(texture.texture);

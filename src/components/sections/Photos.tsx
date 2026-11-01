@@ -10,8 +10,13 @@ const FlexCarousel = React.lazy(async () => {
 
 const LABEL = "text-[11px] uppercase tracking-[0.18em] text-ink-faint"
 
+/** Autoplay carousel dimatikan di HP: geser manual tetap jalan. */
+const isMobile = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 767px), (pointer: coarse)").matches
+
 /** Pasang isi berat setelah elemennya mendekati viewport. */
-function useNearViewport<T extends HTMLElement>(rootMargin = "800px 0px") {
+function useNearViewport<T extends HTMLElement>(rootMargin = "250px 0px") {
   const ref = React.useRef<T>(null)
   const [near, setNear] = React.useState(false)
 
@@ -72,7 +77,7 @@ export function Photos() {
               focusOnClick
               captions
               captureWheel={false}
-              autoplay
+              autoplay={!isMobile()}
               interval={2.6}
             />
           </React.Suspense>

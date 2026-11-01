@@ -17,18 +17,20 @@ import {
   type Effects,
   type Targets,
 } from "./pipeline";
+import { createQuality } from "./quality";
 import { defaultHeroSettings } from "./settings";
 
 const SCENE_YAW_TAU_S = 0.325;
 
 const MAX_FRAME_DT_S = 0.1;
 
-const TARGET_FPS = 60;
-
 const FRAME_PACING_EPSILON_MS = 2;
 
-const MIN_FRAME_INTERVAL_MS = 1000 / TARGET_FPS - FRAME_PACING_EPSILON_MS;
 const MOBILE_QUERY = "(max-width: 767px)";
+
+/** Jumlah frame lambat/cepat berturut-turut sebelum skala internal diubah. */
+const SLOW_FRAMES_BEFORE_DOWNGRADE = 40;
+const FAST_FRAMES_BEFORE_UPGRADE = 240;
 
 interface RendererOptions {
   canvas: HTMLCanvasElement;
@@ -37,6 +39,16 @@ interface RendererOptions {
 type RenderSize = { width: number; height: number };
 
 export function createRenderer({ canvas }: RendererOptions) {
+  const quality = createQuality();
+  let scale = quality.scale;
+  const minFrameIntervalMs = 1000 / quality.fps - FRAME_PACING_EPSILON_MS;
+
+  /** Ukuran buffer GPU: ukuran CSS dikali skala kualitas. */
+  const bufferSize = (width: number, height: number): [number, number] => [
+    Math.max(1, Math.round(width * scale)),
+    Math.max(1, Math.round(height * scale)),
+  ];
+
   const settings = defaultHeroSettings();
   const desktopLayout = {
     centerX: settings.centerX,
@@ -134,17 +146,50 @@ export function createRenderer({ canvas }: RendererOptions) {
     let stopped = false;
 
     let lastPresentedAt: number | undefined;
+    let slowFrames = 0;
+    let fastFrames = 0;
+
+    // Turunkan/naikkan skala render kalau frame tidak stabil. Ukurannya
+    // dihitung ulang di rAF berikutnya, jadi efek tidak pernah hilang.
+    const retune = (next: number) => {
+      scale = next;
+      slowFrames = 0;
+      fastFrames = 0;
+      measure();
+    };
+
     const tick = (timestamp: number): void => {
       if (stopped) return;
       if (
         lastPresentedAt === undefined ||
-        timestamp - lastPresentedAt >= MIN_FRAME_INTERVAL_MS
+        timestamp - lastPresentedAt >= minFrameIntervalMs
       ) {
+        if (lastPresentedAt !== undefined) {
+          const gap = timestamp - lastPresentedAt;
+          if (gap > minFrameIntervalMs * 1.45) {
+            slowFrames += 1;
+            fastFrames = 0;
+          } else if (gap < minFrameIntervalMs * 1.12) {
+            fastFrames += 1;
+            slowFrames = 0;
+          } else {
+            slowFrames = 0;
+            fastFrames = 0;
+          }
+        }
         lastPresentedAt = timestamp;
         try {
           vgpu.frame(activeGpu, renderFrame);
         } catch (error) {
           handleFailure(error);
+        }
+        if (slowFrames >= SLOW_FRAMES_BEFORE_DOWNGRADE && scale > quality.minScale) {
+          retune(Math.max(quality.minScale, scale - 0.1));
+        } else if (
+          fastFrames >= FAST_FRAMES_BEFORE_UPGRADE &&
+          scale < quality.scale
+        ) {
+          retune(Math.min(quality.scale, scale + 0.05));
         }
       }
       if (!stopped) frameHandle = requestAnimationFrame(tick);
@@ -205,15 +250,19 @@ export function createRenderer({ canvas }: RendererOptions) {
     if (disposed || !size || !gpu || !api || !effects || !targets || !surface)
       return;
     try {
-      // vgpu tidak memasang auto-resize sendiri: surface harus disuruh
-      // menyusul ukuran elemen, kalau tidak buffer GPU tetap di ukuran awal
-      // dan kanvas jadi gepeng/bertepi saat jendela berubah.
-      ;(surface as Surface & { applyAutoResize?: () => void }).applyAutoResize?.();
+      // Surface tidak memakai auto-resize (lihat initialize): ukuran buffer
+      // dikelola di sini supaya skala kualitas bisa berubah saat berjalan.
+      const next = bufferSize(size.width, size.height);
+      if (
+        targets &&
+        next[0] === surface.size[0] &&
+        next[1] === surface.size[1]
+      ) {
+        return;
+      }
+      surface.resize(next);
       const previousTargets = targets;
-      const nextTargets = createTargets(api, gpu, [
-        Math.max(1, Math.round(size.width)),
-        Math.max(1, Math.round(size.height)),
-      ]);
+      const nextTargets = createTargets(api, gpu, next);
       try {
         setBindings(effects, nextTargets);
         setPostUniforms(effects, nextTargets, settings);
@@ -269,8 +318,14 @@ export function createRenderer({ canvas }: RendererOptions) {
     }
     gpu = nextGpu;
     api = vgpu;
-    surface = vgpu.surface(gpu, canvas, { dpr: 1 });
-    effects = createEffects(vgpu, gpu);
+    const cssWidth = Math.max(1, canvas.clientWidth);
+    const cssHeight = Math.max(1, canvas.clientHeight);
+    surface = vgpu.surface(gpu, canvas, {
+      autoResize: false,
+      dpr: 1,
+      size: bufferSize(cssWidth, cssHeight),
+    });
+    effects = createEffects(vgpu, gpu, quality.aaTaps);
     targets = createTargets(vgpu, gpu, surface.size);
     setBakeUniforms(effects, targets, settings);
     setShadeUniforms(effects, targets, settings, animationTime, currentSceneYaw);

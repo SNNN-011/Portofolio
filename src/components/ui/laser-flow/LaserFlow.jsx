@@ -373,6 +373,11 @@ const TINTS = [
 
 const BASE_SATURATION = 0.78;
 const MAX_RENDER_DIM = 2048;
+// Di layar kecil, resolusi dan fps diturunkan: sinar tetap sama, hanya lebih
+// murah buat GPU HP.
+const MOBILE_QUERY = '(max-width: 767px), (pointer: coarse)';
+const MOBILE_MAX_RENDER_DIM = 1600;
+const MOBILE_MIN_FRAME_MS = 1000 / 30;
 const INTRO_DROP = 1.25;
 const INTRO_END = 5;
 
@@ -586,6 +591,8 @@ export const LaserFlow = ({
     };
     let raf = 0;
     let last = 0;
+    let lastRenderAt = 0;
+    const mobile = window.matchMedia(MOBILE_QUERY).matches;
     let visible = true;
     let alive = true;
 
@@ -678,9 +685,12 @@ export const LaserFlow = ({
       const width = Math.max(1, container.clientWidth);
       const height = Math.max(1, container.clientHeight);
       const s = settingsRef.current;
-      const baseDpr = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
+      const mobile = window.matchMedia(MOBILE_QUERY).matches;
+      const dprCap = mobile ? 1 : 2;
+      const dimCap = mobile ? MOBILE_MAX_RENDER_DIM : MAX_RENDER_DIM;
+      const baseDpr = Math.min(s.dpr || window.devicePixelRatio || 1, dprCap);
       const longest = Math.max(width, height) * baseDpr;
-      const ratio = longest > MAX_RENDER_DIM ? (baseDpr * MAX_RENDER_DIM) / longest : baseDpr;
+      const ratio = longest > dimCap ? (baseDpr * dimCap) / longest : baseDpr;
       const pixelWidth = Math.max(1, Math.round(width * ratio));
       const pixelHeight = Math.max(1, Math.round(height * ratio));
       if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
@@ -812,6 +822,13 @@ export const LaserFlow = ({
       const goal = active ? 1 : 0;
       lens.strength += (goal - lens.strength) * (1 - Math.exp(-dt / (goal > lens.strength ? 0.3 : 0.55)));
       if (lens.strength < 0.001 && !active) lens.placed = false;
+
+      // Di HP cukup 30fps; animasinya lambat jadi tidak terasa patah.
+      if (mobile && lastRenderAt && now - lastRenderAt < MOBILE_MIN_FRAME_MS - 1) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastRenderAt = now;
 
       render();
       const settling =

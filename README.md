@@ -53,13 +53,14 @@ src/
     ui/liquid-glass-navbar.tsx    navbar kaca + shader air WebGL (disimpan; repo terpisah)
     ui/black-hole-canvas.tsx      host WebGPU untuk latar hero
     ui/black-hole/                sumber contoh vgpu (dipakai apa adanya)
+      quality.ts                  skala/fps/tap AA per jenis perangkat
     ui/laser-card-layer.tsx       penempatan berkas laser di kartu unggulan
     ui/laser-flow/                shader LaserFlow (WebGL2, satu file GLSL)
     ui/flex-carousel/             carousel geser berbasis canvas
     ui/project-previews.tsx       5 pratinjau use-case per proyek
   docs/                           gambar pratinjau untuk README (bukan bagian app)
 public/
-  assets/photos/                  foto galeri (.webp)
+  assets/photos/                  foto galeri (.webp); forweb/small/ = varian HP
   fonts/                          Fraunces + Inter Tight (subset, self-host)
   icon-*.png                      favicon dari logo Y
 ```
@@ -71,8 +72,9 @@ Dua konteks GPU dipakai berdampingan: **WebGL2** (kartu laser, carousel) dan **W
 - **Berkas laser.** Satu shader `LaserFlow` di `ui/laser-flow/LaserFlow.jsx`. Untuk kartu unggulan, kanvasnya dipasang selebar layar mulai dari bawah hero sampai ±560px di bawah kartu, dengan `mask-image` supaya ujungnya tidak terpotong. Di bawah tepi kartu, bentuk tumpahan "dibekukan" pada tinggi tepi lalu dilanjutkan dengan `fall` yang bertambah, sehingga cahayanya turun dan melebar natural, tanpa menyorot garis bawah kartu atau kartu proyek di bawahnya.
 - **Posisi sinar** diatur lewat `BEAM_ON_CARD` (rasio lebar kartu) di `laser-card-layer.tsx`, warnanya lewat prop `color`.
 - **Font** di-host sendiri di `public/fonts/` (bukan Google Fonts) dan di-preload: Fraunces sudah di-subset dan di-instance di wght 300, Inter Tight tetap variable untuk 400/500. Tidak ada stylesheet pihak ketiga yang memblokir render.
-- **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport. Foto galeri (±2,9 MB) tidak diunduh sebelum pengguna mendekati seksi Foto.
-- **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) dipisah ke repo sendiri, [SNNN-011/liquid-navbar](https://github.com/SNNN-011/liquid-navbar), lengkap dengan demo; salinannya tetap ada di sini, cukup tukar impornya di `src/App.tsx` untuk memakai lagi.
+- **Pemuatan bertahap.** Kanvas LaserFlow dan carousel foto diimpor dinamis dan baru dipasang saat elemennya mendekati viewport (250px). Foto galeri tidak diunduh sebelum pengguna mendekati seksi Foto; di layar sempit dipakai varian `forweb/small/` (±1,7 MB, bukan ±2,9 MB), dan teksturnya diperkecil sebelum masuk GPU.
+- **Efek hemat di HP, tampilan tetap sama.** Black hole merender di 0,75 skala internal (0,6 untuk perangkat kelas bawah), dibatasi 30fps, dan punya penyesuaian otomatis: kalau frame lambat berturut-turut resolusinya turun, kalau sudah longgar naik lagi (lihat `black-hole/quality.ts`). Laser memakai batas resolusi 1600px dan 30fps di HP. Carousel mematikan autoplay di HP (geser manual tetap jalan) dan mengunggah tekstur maksimal 1000px.
+- **Navbar.** `NavPill` hanya memakai CSS: tanpa kanvas, `backdrop-filter`, atau animasi yang jalan terus. Versi kaca ber-shader air (`ui/liquid-glass-navbar.tsx`) dipisah ke repo sendiri, [SNNN-011/liquid-navbar](https://github.com/SNNN-011/liquid-navbar), lengkap dengan demo; salinannya tetap ada di sini, cukup tukar impornya di `src/App.tsx` untuk memakai lagi. Aset foto mentah yang tidak terpakai dan `logo-y.png` sudah dihapus dari `public/`.
 - **Bundel awal** hanya berisi React, host black hole, dan konten teks (±93 KB gzip); sisa efek masuk chunk terpisah.
 
 ## Deploy

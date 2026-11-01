@@ -56,18 +56,36 @@ const GBUFFER_FORMATS: readonly GPUTextureFormat[] = [
 const AA_FORMATS: readonly GPUTextureFormat[] = ["rg8unorm", "rgba16float"];
 const CLEAR: readonly [number, number, number, number] = [0, 0, 0, 1];
 
-export function createEffects(vgpu: VgpuApi, gpu: Gpu): Effects {
+export function createEffects(
+  vgpu: VgpuApi,
+  gpu: Gpu,
+  aaTaps = 6
+): Effects {
   const postSampler = vgpu.sampler(gpu, {
     minFilter: "linear",
     magFilter: "linear",
   });
   const noiseSampler = noiseVolumeSampler(vgpu, gpu);
+  // Hanya jumlah tap anti-alias tepi cakram yang disesuaikan; isi shader lain
+  // tetap apa adanya dari manifest.
+  const shadeSource =
+    aaTaps === 6
+      ? shadeWgsl
+      : {
+          ...shadeWgsl,
+          wgsl: shadeWgsl.wgsl.replace(
+            /const AA_TAPS:\s*i32\s*=\s*\d+;/,
+            `const AA_TAPS: i32 = ${aaTaps};`
+          ),
+        };
   return {
     bake: vgpu.effect(gpu, bakeWgsl, { label: "optimized-black-hole-bake" }),
     refine: vgpu.effect(gpu, refineWgsl, {
       label: "optimized-black-hole-refine",
     }),
-    shade: vgpu.effect(gpu, shadeWgsl, { label: "optimized-black-hole-shade" }),
+    shade: vgpu.effect(gpu, shadeSource, {
+      label: "optimized-black-hole-shade",
+    }),
     bloomExtract: vgpu.effect(gpu, bloomWgsl),
     bloomBlurH0: vgpu.effect(gpu, bloomWgsl),
     bloomBlurV0: vgpu.effect(gpu, bloomWgsl),

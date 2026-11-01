@@ -68,7 +68,7 @@ export function LaserCardLayer() {
           // setelah animasi selesai — bukan tiap kali halaman di-scroll.
           armTimer = window.setTimeout(() => measure(), 700)
         },
-        { rootMargin: "80% 0px" }
+        { rootMargin: "200px 0px" }
       )
       armedIo.observe(card)
     }

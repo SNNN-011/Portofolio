@@ -30,4 +30,17 @@ const PHOTO_LIST: Photo[] = [
   { src: "/assets/photos/forweb/23.webp", title: "Anjing di Dahan", alt: "Anjing di atas dahan pohon di tepi danau", ratio: 0.562 },
 ]
 
-export const PHOTOS: Photo[] = PHOTO_LIST.map((p) => ({ ...p, src: BASE + p.src.slice(1) }))
+// Foto versi kecil hanya untuk layar sempit: unduhan ±1,7 MB, bukan ±2,9 MB,
+// dan dekode gambarnya lebih ringan. Desktop tetap memakai file penuh.
+const SMALL_QUERY = "(max-width: 767px), (pointer: coarse)"
+const USE_SMALL =
+  typeof window !== "undefined" && window.matchMedia(SMALL_QUERY).matches
+
+export const PHOTOS: Photo[] = PHOTO_LIST.map((p) => ({
+  ...p,
+  src:
+    BASE +
+    (USE_SMALL
+      ? p.src.replace("/forweb/", "/forweb/small/").slice(1)
+      : p.src.slice(1)),
+}))
