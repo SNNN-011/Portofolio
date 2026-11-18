@@ -56,7 +56,7 @@ src/
       quality.ts                  skala/fps/tap AA per jenis perangkat
     ui/laser-card-layer.tsx       penempatan berkas laser di kartu unggulan
     ui/laser-flow/                shader LaserFlow (WebGL2, satu file GLSL)
-    ui/flex-carousel/             carousel geser berbasis canvas
+    ui/flex-carousel/             carousel geser berbasis canvas (WebGL lewat ogl)
     ui/project-previews.tsx       5 pratinjau use-case per proyek
   docs/                           gambar pratinjau untuk README (bukan bagian app)
 public/
